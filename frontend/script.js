@@ -59,6 +59,13 @@
 
     const HISTORY_LEN = 30;
     const UPDATE_MS = 2500;
+    const SENSOR_COLORS = {
+      pH: '#0ea5e9',
+      temperature: '#f59e0b',
+      do: '#22c55e',
+      turbidity: '#a78bfa',
+      conductivity: '#f472b6'
+    };
 
     // ========== State ==========
     let history = {};
@@ -69,6 +76,7 @@
     let alertLog = [];
     let trendChart = null;
     let gaugeCharts = {};
+    let activeSensor = 'pH';   // currently plotted sensor
 
     Object.keys(PARAMS).forEach(k => {
       history[k] = [];
@@ -140,18 +148,13 @@
     }
 
     function updateTrendChart() {
-      const labels = history.pH.map((_, i) => {
-        const offset = HISTORY_LEN - history.pH.length + i;
+      const labels = history[activeSensor].map((_, i) => {
+        const offset = HISTORY_LEN - history[activeSensor].length + i;
         return offset === HISTORY_LEN - 1 ? 'Now' : `-${HISTORY_LEN - 1 - offset}`;
       });
 
-      const datasets = [
-        { key: 'pH', color: '#0ea5e9', yAxisID: 'y' },
-        { key: 'temperature', color: '#f59e0b', yAxisID: 'y1' },
-        { key: 'do', color: '#22c55e', yAxisID: 'y' },
-        { key: 'turbidity', color: '#a78bfa', yAxisID: 'y1' },
-        { key: 'conductivity', color: '#f472b6', yAxisID: 'y1', hidden: true }
-      ];
+      const color = SENSOR_COLORS[activeSensor] || '#0ea5e9';
+      const p = PARAMS[activeSensor];
 
       if (!trendChart) {
         const ctx = document.getElementById('trendChart').getContext('2d');
@@ -159,40 +162,33 @@
           type: 'line',
           data: {
             labels,
-            datasets: datasets.map(d => ({
-              label: PARAMS[d.key].label,
-              data: history[d.key],
-              borderColor: d.color,
-              backgroundColor: d.color + '22',
-              borderWidth: 2,
+            datasets: [{
+              label: p.label,
+              data: history[activeSensor],
+              borderColor: color,
+              backgroundColor: color + '33',
+              borderWidth: 2.5,
               tension: 0.35,
               pointRadius: 0,
-              pointHoverRadius: 4,
-              fill: false,
-              yAxisID: d.yAxisID,
-              hidden: d.hidden || false
-            }))
+              pointHoverRadius: 5,
+              fill: true
+            }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-              legend: {
-                position: 'top',
-                labels: {
-                  color: '#94a3b8',
-                  boxWidth: 12,
-                  padding: 16,
-                  font: { size: 11 }
-                }
-              },
+              legend: { display: false },
               tooltip: {
                 backgroundColor: '#1e293b',
                 titleColor: '#f1f5f9',
                 bodyColor: '#cbd5e1',
                 borderColor: '#334155',
-                borderWidth: 1
+                borderWidth: 1,
+                callbacks: {
+                  label: (ctx) => `${p.label}: ${Number(ctx.raw).toFixed(p.decimals)} ${p.unit}`
+                }
               }
             },
             scales: {
@@ -201,27 +197,45 @@
                 grid: { color: 'rgba(51, 65, 85, 0.4)' }
               },
               y: {
-                position: 'left',
                 ticks: { color: '#64748b', font: { size: 10 } },
                 grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                title: { display: true, text: 'pH / DO', color: '#64748b', font: { size: 10 } }
-              },
-              y1: {
-                position: 'right',
-                ticks: { color: '#64748b', font: { size: 10 } },
-                grid: { drawOnChartArea: false },
-                title: { display: true, text: 'Temp / Turbidity', color: '#64748b', font: { size: 10 } }
+                title: {
+                  display: true,
+                  text: p.unit ? `${p.label} (${p.unit})` : p.label,
+                  color: '#64748b',
+                  font: { size: 11 }
+                }
               }
             }
           }
         });
       } else {
         trendChart.data.labels = labels;
-        datasets.forEach((d, i) => {
-          trendChart.data.datasets[i].data = history[d.key];
-        });
+        trendChart.data.datasets[0].label = p.label;
+        trendChart.data.datasets[0].data = history[activeSensor];
+        trendChart.data.datasets[0].borderColor = color;
+        trendChart.data.datasets[0].backgroundColor = color + '33';
+        trendChart.options.scales.y.title.text = p.unit ? `${p.label} (${p.unit})` : p.label;
+        trendChart.options.plugins.tooltip.callbacks.label = (ctx) =>
+          `${p.label}: ${Number(ctx.raw).toFixed(p.decimals)} ${p.unit}`;
         trendChart.update('none');
       }
+
+      // Update chart title
+      const titleEl = document.getElementById('chartTitle');
+      if (titleEl) titleEl.textContent = `${p.label} Trend`;
+    }
+
+    function switchSensor(sensorKey) {
+      if (!PARAMS[sensorKey] || sensorKey === activeSensor) return;
+      activeSensor = sensorKey;
+
+      // Update button states
+      document.querySelectorAll('.sensor-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sensor === sensorKey);
+      });
+
+      updateTrendChart();
     }
 
     function renderGauges() {
@@ -302,13 +316,6 @@
     function updateMeta() {
       document.getElementById('lastUpdate').textContent =
         `Last update: ${nowStr()}`;
-      document.getElementById('sampleCount').textContent = sampleCount;
-
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-      const s = String(elapsed % 60).padStart(2, '0');
-      document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
     }
 
     // ========== Simulation loop ==========
@@ -357,6 +364,11 @@
       alertLog = [];
       addAlert('Simulation reset — all values nominal', 'good');
       tick();
+    });
+
+    // Sensor switcher buttons
+    document.querySelectorAll('.sensor-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchSensor(btn.dataset.sensor));
     });
 
     // ========== Init ==========

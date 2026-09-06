@@ -14,7 +14,7 @@
   <div class="app">
     <header>
       <div class="brand">
-        <div class="logo"></div>
+        <div class="logo">💧</div>
         <div>
           <h1>AquaSense</h1>
           <p>Water Quality Monitoring System</p>
@@ -32,7 +32,7 @@
         </div>
       </div>
     </header>
-
+    
     <!-- KPI Cards -->
     <section class="kpi-grid" id="kpiGrid">
       <!-- Filled by JS -->
@@ -45,6 +45,12 @@
           <div class="panel-title">
             Parameter Trends
             <span>Last 30 samples · auto-refresh</span>
+          </div>
+          <div class="sensor-switcher" id="sensorSwitcher">
+            <button class="sensor-btn active" data-sensor="pH">pH</button>
+            <button class="sensor-btn" data-sensor="temperature">Temperature</button>
+            <button class="sensor-btn" data-sensor="do">Dissolved Oxygen</button>
+            <button class="sensor-btn" data-sensor="turbidity">Turbidity</button>
           </div>
           <div class="chart-container">
             <canvas id="trendChart"></canvas>
@@ -59,28 +65,6 @@
       <!-- Side panel -->
       <div class="side-stack">
         <div class="panel">
-          <div class="panel-title">System Status</div>
-          <div class="status-grid">
-            <div class="status-item">
-              <div class="label">Sensors</div>
-              <div class="value status-online">5 / 5 Online</div>
-            </div>
-            <div class="status-item">
-              <div class="label">Gateway</div>
-              <div class="value status-online">Connected</div>
-            </div>
-            <div class="status-item">
-              <div class="label">Location</div>
-              <div class="value">Station A-12</div>
-            </div>
-            <div class="status-item">
-              <div class="label">Uptime</div>
-              <div class="value" id="uptime">00:00:00</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
           <div class="panel-title">
             Recent Alerts
             <span id="alertCount">0</span>
@@ -92,27 +76,6 @@
                 All sensors reporting nominal values.
                 <div class="time">Just now</div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Quick Stats</div>
-          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7;">
-            <div style="display: flex; justify-content: space-between;">
-              <span>Samples collected</span>
-              <strong id="sampleCount" style="color: var(--text);">0</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span>Avg. update interval</span>
-              <strong style="color: var(--text);">2.5 s</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span>Data mode</span>
-              <strong style="color: var(--accent);">Simulated</strong>
-            </div>
-            <div style="margin-top: 0.75rem; font-size: 0.75rem;">
-              Connect real sensors by replacing the simulation functions with your MQTT / HTTP / WebSocket feed.
             </div>
           </div>
         </div>
