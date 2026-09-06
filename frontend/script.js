@@ -23,15 +23,15 @@
         decimals: 1
       },
       do: {
-        label: 'Dissolved Oxygen',
+        label: 'TDS',
         unit: 'mg/L',
         icon: '💨',
-        min: 0, max: 15,
-        good: [6, 12],
-        warn: [4, 14],
-        base: 8.4,
-        variance: 0.4,
-        decimals: 1
+        min: 0, max: 2000,
+        good: [200, 800],
+        warn: [100, 1200],
+        base: 480,
+        variance: 25,
+        decimals: 0
       },
       turbidity: {
         label: 'Turbidity',
@@ -44,17 +44,6 @@
         variance: 0.9,
         decimals: 1
       },
-      conductivity: {
-        label: 'Conductivity',
-        unit: 'µS/cm',
-        icon: '⚡',
-        min: 0, max: 2000,
-        good: [200, 800],
-        warn: [100, 1200],
-        base: 480,
-        variance: 25,
-        decimals: 0
-      }
     };
 
     const HISTORY_LEN = 30;
@@ -375,8 +364,10 @@
     // Seed history
     for (let i = 0; i < 12; i++) {
       Object.keys(PARAMS).forEach(key => {
-        current[key] = randomWalk(key);
-        history[key].push(current[key]);
+        current[key] = PARAMS[key].base;
+        for (let i=0; i < 12; i++) {
+          history[key].push(PARAMS[key].base);
+        }
       });
     }
 
