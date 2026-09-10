@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real-Time Water Quality Dashboard</title>
+  <title>AquaSense | Real-Time Water Quality Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app">
@@ -21,48 +21,40 @@
         </div>
       </div>
       <div class="header-meta">
-        <div class="live-badge">
+        <div class="live-badge" id="connectionBadge">
           <span class="live-dot"></span>
-          LIVE
+          <span id="connectionText">CONNECTING...</span>
         </div>
-        <div class="timestamp" id="lastUpdate">Updating…</div>
+        <div class="timestamp" id="lastUpdate">Waiting for data…</div>
         <div class="controls">
           <button id="btnPause" title="Pause / Resume updates">Pause</button>
-          <button id="btnReset" title="Reset simulation">Reset</button>
+          <button id="btnReset" title="Reset">Reset</button>
         </div>
       </div>
     </header>
-    
-    <!-- KPI Cards -->
-    <section class="kpi-grid" id="kpiGrid">
-      <!-- Filled by JS -->
-    </section>
+
+    <section class="kpi-grid" id="kpiGrid"></section>
 
     <div class="main-grid">
-      <!-- Charts -->
       <div>
         <div class="panel">
           <div class="panel-title">
-            Parameter Trends
-            <span>Last 30 samples · auto-refresh</span>
+            <span id="chartTitle">pH Level Trend</span>
+            <span>Last 30 samples</span>
           </div>
           <div class="sensor-switcher" id="sensorSwitcher">
             <button class="sensor-btn active" data-sensor="pH">pH</button>
             <button class="sensor-btn" data-sensor="temperature">Temperature</button>
-            <button class="sensor-btn" data-sensor="do">TDS</button>
+            <button class="sensor-btn" data-sensor="tds">TDS</button>
             <button class="sensor-btn" data-sensor="turbidity">Turbidity</button>
           </div>
           <div class="chart-container">
             <canvas id="trendChart"></canvas>
           </div>
         </div>
-
-        <div class="gauges" id="gaugeSection">
-          <!-- Mini gauges -->
-        </div>
+        <div class="gauges" id="gaugeSection"></div>
       </div>
 
-      <!-- Side panel -->
       <div class="side-stack">
         <div class="panel">
           <div class="panel-title">
@@ -72,9 +64,8 @@
           <div class="alerts-list" id="alertsList">
             <div class="alert-item" style="border-left-color: var(--good);">
               <div>
-                <strong>System ready</strong><br>
-                All sensors reporting nominal values.
-                <div class="time">Just now</div>
+                <strong>Waiting for Arduino…</strong>
+                <div class="time">Run: python serial_reader.py</div>
               </div>
             </div>
           </div>
@@ -83,7 +74,7 @@
     </div>
 
     <footer>
-      <div>AquaSense Dashboard · Water Quality Monitoring Project</div>
+      <div>AquaSense Dashboard · Real-time Sensor Mode</div>
       <div class="legend">
         <div class="legend-item"><span class="legend-dot" style="background: var(--good)"></span> Good</div>
         <div class="legend-item"><span class="legend-dot" style="background: var(--warning)"></span> Warning</div>
@@ -91,6 +82,7 @@
       </div>
     </footer>
   </div>
-  <script src="js/script.js"></script>
+
+  <script src="script.js"></script>
 </body>
 </html>
