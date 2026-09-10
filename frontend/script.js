@@ -118,7 +118,7 @@ const PARAMS = {
     }
 
     function renderGauges() {
-      const keys = ['pH','tds','turbidity'];
+      const keys = Object.keys(PARAMS);
       const section = document.getElementById('gaugeSection');
       if (!section.children.length) {
         section.innerHTML = keys.map(k => `
