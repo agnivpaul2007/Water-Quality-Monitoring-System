@@ -2,30 +2,30 @@
 
 struct SensorData
 {
-  float pH;
   float temperature;
-  float TDS;
   float turbidity;
 };
 SensorData data;
 
-int pH_sensorPin = A0;
-int temperature_sensorPin = A1;
-int TDS_sensorPin = A2;
-int turbidity_sensorPin = A3;
+int temperature_sensorPin = D2;
+int turbidity_sensorPin = A0;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(pH_sensorPin, INPUT);
   pinMode(turbidity_sensorPin, INPUT);
   pinMode(temperature_sensorPin, INPUT);
-  pinMode(TDS_sensorPin, INPUT);
 }
 
-float readSensor(int pin)
+float analogreadSensor(int pin)
 {
   int sensorValue = analogRead(pin);
+  float voltage = sensorValue * (5.0 / 1023.0);
+  return voltage;
+}
+float digitalreadSensor(int pin)
+{
+  int sensorValue = digitalRead(pin);
   float voltage = sensorValue * (5.0 / 1023.0);
   return voltage;
 }
@@ -51,10 +51,8 @@ float turbidityConversion(float voltage)
 
 void loop()
 {
-  data.pH = phConversion(readSensor(pH_sensorPin));
-  data.temperature = temperatureConversion(readSensor(temperature_sensorPin));
-  data.TDS = TDSConversion(readSensor(TDS_sensorPin));
-  data.turbidity = turbidityConversion(readSensor(turbidity_sensorPin));
+  data.temperature = temperatureConversion(analogreadSensor(temperature_sensorPin));
+  data.turbidity = turbidityConversion(digitalreadSensor(turbidity_sensorPin));
 
   Serial.write((uint8_t *)&data, sizeof(data));
   delay(1000);
