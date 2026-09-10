@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AquaSense | Real-Time Water Quality Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,18 +15,20 @@
         <div class="logo">💧</div>
         <div>
           <h1>AquaSense</h1>
-          <p>Water Quality Monitoring System</p>
+          <p>Web Serial • Direct Arduino Connection</p>
         </div>
       </div>
       <div class="header-meta">
         <div class="live-badge" id="connectionBadge">
           <span class="live-dot"></span>
-          <span id="connectionText">CONNECTING...</span>
+          <span id="connectionText">NOT CONNECTED</span>
         </div>
-        <div class="timestamp" id="lastUpdate">Waiting for data…</div>
+        <div class="timestamp" id="lastUpdate">Click “Connect Arduino”</div>
         <div class="controls">
-          <button id="btnPause" title="Pause / Resume updates">Pause</button>
-          <button id="btnReset" title="Reset">Reset</button>
+          <button id="btnConnect" class="primary">Connect Arduino</button>
+          <button id="btnDisconnect" disabled>Disconnect</button>
+          <button id="btnPause">Pause</button>
+          <button id="btnReset">Reset</button>
         </div>
       </div>
     </header>
@@ -42,7 +42,7 @@
             <span id="chartTitle">pH Level Trend</span>
             <span>Last 30 samples</span>
           </div>
-          <div class="sensor-switcher" id="sensorSwitcher">
+          <div class="sensor-switcher">
             <button class="sensor-btn active" data-sensor="pH">pH</button>
             <button class="sensor-btn" data-sensor="temperature">Temperature</button>
             <button class="sensor-btn" data-sensor="tds">TDS</button>
@@ -57,15 +57,12 @@
 
       <div class="side-stack">
         <div class="panel">
-          <div class="panel-title">
-            Recent Alerts
-            <span id="alertCount">0</span>
-          </div>
+          <div class="panel-title">Recent Alerts <span id="alertCount">0</span></div>
           <div class="alerts-list" id="alertsList">
-            <div class="alert-item" style="border-left-color: var(--good);">
+            <div class="alert-item" style="border-left-color:var(--good)">
               <div>
-                <strong>Waiting for Arduino…</strong>
-                <div class="time">Run: python serial_reader.py</div>
+                <strong>Ready</strong>
+                <div class="time">Click “Connect Arduino” and select the COM port</div>
               </div>
             </div>
           </div>
@@ -74,11 +71,11 @@
     </div>
 
     <footer>
-      <div>AquaSense Dashboard · Real-time Sensor Mode</div>
+      <div>AquaSense • Direct Web Serial (no backend)</div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background: var(--good)"></span> Good</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--warning)"></span> Warning</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--critical)"></span> Critical</div>
+        <span><span class="legend-dot" style="background:var(--good)"></span>Good</span>
+        <span><span class="legend-dot" style="background:var(--warning)"></span>Warning</span>
+        <span><span class="legend-dot" style="background:var(--critical)"></span>Critical</span>
       </div>
     </footer>
   </div>
