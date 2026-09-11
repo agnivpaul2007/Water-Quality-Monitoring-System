@@ -1,4 +1,11 @@
 #include <Arduino.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define ONE_WIRE_BUS 2
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature tempSensor(&oneWire);
+
 
 struct SensorData
 {
@@ -7,53 +14,49 @@ struct SensorData
 };
 SensorData data;
 
-int temperature_sensorPin = D2;
+int temperature_sensorPin = 2;
 int turbidity_sensorPin = A0;
 
 void setup()
 {
   Serial.begin(9600);
+  tempSensor.begin();
   pinMode(turbidity_sensorPin, INPUT);
   pinMode(temperature_sensorPin, INPUT);
 }
 
 float analogreadSensor(int pin)
 {
-  int sensorValue = analogRead(pin);
-  float voltage = sensorValue * (5.0 / 1023.0);
-  return voltage;
-}
-float digitalreadSensor(int pin)
-{
-  int sensorValue = digitalRead(pin);
-  float voltage = sensorValue * (5.0 / 1023.0);
-  return voltage;
-}
-
-float phConversion(float voltage)
-{
-  return (voltage - 2.5) * 3.0; // Example conversion for pH sensor
+  int sensorValue = 0;
+  float sumvoltage = 0;
+  for(int i = 0; i < 10; i++)
+  {
+    sensorValue = analogRead(pin);
+    sumvoltage += sensorValue * (5.0 / 1023.0);
+  }
+  return sumvoltage/10.0;
 }
 
-float temperatureConversion(float voltage)
-{
-  return (voltage - 0.5) * 100.0; // Example conversion for temperature sensor
-}
-float TDSConversion(float voltage)
-{
-  return voltage * 20.0; // Example conversion for TDS sensor
-}
 float turbidityConversion(float voltage)
 {
-  return voltage * 100.0; // Example conversion for turbidity sensor
+  float turbudity = map(voltage, 0, 640, 100, 0) - 25;
+  return turbudity; // Example conversion for turbidity sensor
 }
 
 
 void loop()
 {
-  data.temperature = temperatureConversion(analogreadSensor(temperature_sensorPin));
-  data.turbidity = turbidityConversion(digitalreadSensor(turbidity_sensorPin));
-
-  Serial.write((uint8_t *)&data, sizeof(data));
+  tempSensor.requestTemperatures();
+  data.temperature = tempSensor.getTempCByIndex(0);
+  data.turbidity = turbidityConversion(analogRead(turbidity_sensorPin));
+  Serial.print(F("{\"pH\":"));
+  Serial.print("0");
+  Serial.print(F(",\"temperature\":"));
+  Serial.print(data.temperature, 2);
+  Serial.print(F(",\"turbidity\":"));
+  Serial.print(data.turbidity, 1);
+  Serial.print(F(",\"tds\":"));
+  Serial.print("0");
+  Serial.println(F("}"));
   delay(1000);
 }
