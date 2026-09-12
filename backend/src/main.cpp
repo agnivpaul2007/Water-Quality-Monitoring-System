@@ -27,7 +27,7 @@ void setup()
 
 float turbidityConversion(float voltage)
 {
-  float turbudity = map(voltage, 0, 640, 100, 0) - 25;
+  float turbudity = map(voltage, 0, 640, 100, 0) - 75;
   return turbudity;
 }
 
@@ -49,7 +49,7 @@ void loop()
   Serial.print(F(",\"temperature\":"));
   Serial.print(data.temperature, 2);
   Serial.print(F(",\"turbidity\":"));
-  Serial.print(data.turbidity, 1);
+  Serial.print(data.turbidity, 2);
   Serial.print(F(",\"tds\":"));
   Serial.print(data.TDS, 2);
   Serial.println(F("}"));
