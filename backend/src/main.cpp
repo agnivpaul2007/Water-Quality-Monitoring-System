@@ -11,10 +11,10 @@ struct SensorData
 };
 SensorData data;
 
-int pH_sensorPin = A2;
 int temperature_sensorPin = 2;
 int turbidity_sensorPin = A0;
 int tds_sensorPin = A1;
+int pH_sensorPin = A2;
 
 OneWire oneWire(temperature_sensorPin);
 DallasTemperature tempSensor(&oneWire);
